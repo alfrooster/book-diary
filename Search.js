@@ -1,7 +1,20 @@
 import { useState } from 'react';
-import { FlatList, Text, View, ActivityIndicator, Image, StyleSheet } from 'react-native';
+import { FlatList, Text, View, Image, StyleSheet } from 'react-native';
 import { Input, Button } from '@rneui/themed';
-import { API_KEY } from '@env';
+import { initializeApp, getApps, getApp } from "firebase/app";
+import { getDatabase, ref, push } from 'firebase/database';
+import { API_KEY, FIRE_BASE } from '@env';
+
+const firebaseConfig = {
+  FIRE_BASE
+};
+
+//initialize firebase
+if (getApps().length === 0) {
+  initializeApp(firebaseConfig)
+}
+const app = getApp();
+const database = getDatabase(app);
 
 export default function Search() {
   const [data, setData] = useState([]);
@@ -9,6 +22,8 @@ export default function Search() {
   const [author, setAuthor] = useState('');
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState(0);
+
+  const itemsRef = ref(database, 'books/');
 
   const fetchBook = () => {
     setLoading(true);
@@ -31,6 +46,23 @@ export default function Search() {
       })
       .catch(err => console.error(err))
     }
+  }
+
+  const saveItem = (key) => {
+    obj = {'title': data[key].volumeInfo.title,
+    'authors': "Unknown",
+    'date': data[key].volumeInfo.publishedDate,
+    'isbn': data[key].volumeInfo.industryIdentifiers[0].identifier,
+    'image': "No image"};
+    if (data[key].volumeInfo.authors != undefined) {
+      obj.authors = data[key].volumeInfo.authors
+    }
+    if (data[key].volumeInfo.imageLinks != undefined) {
+      obj.image = data[key].volumeInfo.imageLinks.thumbnail
+    }
+    push(
+      itemsRef, obj
+    )
   }
 
   const itemSeparator = () => {
@@ -66,7 +98,7 @@ export default function Search() {
         style={{ marginLeft: 10, marginRight: 10 }}
         contentContainerStyle={{ paddingTop: 10, paddingBottom: 240 }}
         ItemSeparatorComponent={itemSeparator}
-        renderItem={({ item, key }) =>
+        renderItem={({ item, index }) =>
           <> 
           <View style={{ flex: 1, flexDirection: 'row' }}>
             <View style={{ flex: 3 }}>
@@ -99,8 +131,9 @@ export default function Search() {
           </View>
           <View style={{ justifyContent: 'space-evenly', flexDirection: 'row', marginTop: 10 }}>
             <Button radius={'md'} type='outline' raised title='1' />
-            <Button radius={'md'} type='outline' raised title='2' />
-            <Button radius={'md'} type='outline' raised title='3' />
+            <Button onPress={() => saveItem(index)} radius={'md'} type='outline' raised title='ADD to shelf' />
+            <Button radius={'md'} type='outline' raised title='SHOW BOOK' />
+            {/* pressing on book will take you to book's page, stack navigation to Book.js */}
           </View>
           </>}
       />
