@@ -3,10 +3,16 @@ import { StyleSheet, View, FlatList, Image } from 'react-native';
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getDatabase, ref, onValue, remove } from 'firebase/database';
 import { Button, Text } from '@rneui/themed';
-import { FIRE_BASE } from '@env';
+import { FB_API_KEY, AUTH_DOMAIN, DATABASE_URL, PROJECT_ID, STORAGE_BUCKET, MESSAGING_SENDER_ID, APP_ID } from '@env';
 
 const firebaseConfig = {
-  FIRE_BASE
+  apiKey: FB_API_KEY,
+  authDomain: AUTH_DOMAIN,
+  databaseURL: DATABASE_URL,
+  projectId: PROJECT_ID,
+  storageBucket: STORAGE_BUCKET,
+  messagingSenderId: MESSAGING_SENDER_ID,
+  appId: APP_ID
 };
 
 //initialize firebase

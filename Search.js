@@ -1,12 +1,18 @@
 import { useState } from 'react';
-import { FlatList, Text, View, Image, StyleSheet } from 'react-native';
-import { Input, Button } from '@rneui/themed';
+import { FlatList, View, Image, StyleSheet } from 'react-native';
+import { Input, Button, Text } from '@rneui/themed';
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getDatabase, ref, push } from 'firebase/database';
-import { API_KEY, FIRE_BASE } from '@env';
+import { FB_API_KEY, AUTH_DOMAIN, DATABASE_URL, PROJECT_ID, STORAGE_BUCKET, MESSAGING_SENDER_ID, APP_ID } from '@env';
 
 const firebaseConfig = {
-  FIRE_BASE
+  apiKey: FB_API_KEY,
+  authDomain: AUTH_DOMAIN,
+  databaseURL: DATABASE_URL,
+  projectId: PROJECT_ID,
+  storageBucket: STORAGE_BUCKET,
+  messagingSenderId: MESSAGING_SENDER_ID,
+  appId: APP_ID
 };
 
 //initialize firebase

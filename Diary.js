@@ -1,9 +1,107 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { useState, useEffect } from 'react';
+import { StyleSheet, View, FlatList } from 'react-native';
+import { initializeApp, getApps, getApp } from "firebase/app";
+import { getDatabase, ref, push, onValue, remove } from 'firebase/database';
+import { Input, Button, Text } from '@rneui/themed';
+import { FB_API_KEY, AUTH_DOMAIN, DATABASE_URL, PROJECT_ID, STORAGE_BUCKET, MESSAGING_SENDER_ID, APP_ID } from '@env';
+
+const firebaseConfig = {
+  apiKey: FB_API_KEY,
+  authDomain: AUTH_DOMAIN,
+  databaseURL: DATABASE_URL,
+  projectId: PROJECT_ID,
+  storageBucket: STORAGE_BUCKET,
+  messagingSenderId: MESSAGING_SENDER_ID,
+  appId: APP_ID
+};
+
+//initialize firebase
+if (getApps().length === 0) {
+  initializeApp(firebaseConfig)
+}
+const app = getApp();
+const database = getDatabase(app);
 
 export default function Diary() {
+  const [title, setTitle] = useState('');
+  const [note, setNote] = useState('');
+  const [notes, setNotes] = useState([]);
+  const [keys, setKeys] = useState([]);
+
+  const itemsRef = ref(database, 'notes/');
+
+  useEffect(() => {
+    onValue(itemsRef, (snapshot) => {
+      const data = snapshot.val();
+      setNotes(Object.values(data));
+      setKeys(Object.keys(data));
+    })
+  }, []);
+  
+  const deleteItem = (id) => {
+    remove(ref(database, 'notes/' + keys[id]));
+  }
+  
+  const saveItem = (key) => {
+    obj = {'title': title,
+    'note': note};
+    push(
+      itemsRef, obj
+    )
+
+    setNote('');
+    setTitle('');
+  }
+  
+  const itemSeparator = () => {
+    return (
+      <View style={{ height: 1, backgroundColor: 'lightgray', marginTop: 10, marginBottom: 10 }} />
+    )
+  }
+  
   return (
     <View>
-      <Text>Diary</Text>
+      <Input
+        label='Entry title'
+        value={title}
+        placeholder='Title your note'
+        onChangeText={text => setTitle(text)}
+      />
+      <Input
+        label='Entry content'
+        value={note}
+        placeholder='Note here...'
+        onChangeText={text => setNote(text)}
+      />
+      <View style={{ width: 200, alignSelf: 'center' }}>
+        <Button radius={'md'} raised icon={{name: 'save', color:'white'}} onPress={saveItem} />
+      </View>
+      <FlatList
+        data={notes}
+        style={{ marginLeft: 10, marginRight: 10 }}
+        contentContainerStyle={{ paddingTop: 10, paddingBottom: 40 }}
+        ItemSeparatorComponent={itemSeparator}
+        renderItem={({ item, index }) =>
+          <> 
+          <View>
+            <View>
+              <Text style={styles.title}>{item.title}</Text>
+              <Text>{item.note}</Text>
+            </View>
+          </View>
+          <View style={{ justifyContent: 'space-evenly', flexDirection: 'row', marginTop: 10 }}>
+            <Button onPress={() => deleteItem(index)} radius={'md'} type='outline' raised title='DELETE' />
+            <Button radius={'md'} type='outline' raised title='2' />
+            <Button radius={'md'} type='outline' raised title='3' />
+          </View>
+          </>}
+      />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  title: {
+    fontWeight: 'bold',
+  },
+});
