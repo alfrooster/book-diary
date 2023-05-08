@@ -42,11 +42,10 @@ export default function Diary() {
     remove(ref(database, 'notes/' + keys[id]));
   }
   
-  const saveItem = (key) => {
-    obj = {'title': title,
-    'note': note};
-    push(
-      itemsRef, obj
+  const saveItem = () => {
+    const time = new Date();
+    push(itemsRef, 
+      {title: title, note: note, time: `${time.getDate()}.${time.getMonth() + 1}.${time.getFullYear()} ${('0' + time.getHours()).slice(-2)}:${('0' + time.getMinutes()).slice(-2)}`}
     )
 
     setNote('');
@@ -85,14 +84,14 @@ export default function Diary() {
           <> 
           <View>
             <View>
-              <Text style={styles.title}>{item.title}</Text>
-              <Text>{item.note}</Text>
+              <Text style={styles.boldbody}>{item.title} ({item.bookname})</Text>
+              <Text style={styles.body}>{item.time}</Text>
+              <Text style={styles.body}>{item.note}</Text>
             </View>
           </View>
           <View style={{ justifyContent: 'space-evenly', flexDirection: 'row', marginTop: 10 }}>
             <Button onPress={() => deleteItem(index)} radius={'md'} type='outline' raised title='DELETE' />
-            <Button radius={'md'} type='outline' raised title='2' />
-            <Button radius={'md'} type='outline' raised title='3' />
+            <Button radius={'md'} type='outline' raised title='EDIT' />
           </View>
           </>}
       />
@@ -103,5 +102,13 @@ export default function Diary() {
 const styles = StyleSheet.create({
   title: {
     fontWeight: 'bold',
+    fontSize: 28
+  },
+  body: {
+    fontSize: 16
+  },
+  boldbody: {
+    fontWeight: 'bold',
+    fontSize: 16
   },
 });

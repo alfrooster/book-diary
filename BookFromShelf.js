@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { StyleSheet, View, Image, Alert, FlatList, ScrollView } from 'react-native';
 import { Button, Text, Dialog, CheckBox, Input } from '@rneui/themed';
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getDatabase, ref, push, remove, onValue } from 'firebase/database';
+import { getDatabase, ref, push, remove, onValue, query, equalTo, orderByChild } from 'firebase/database';
 import { FB_API_KEY, AUTH_DOMAIN, DATABASE_URL, PROJECT_ID, STORAGE_BUCKET, MESSAGING_SENDER_ID, APP_ID } from '@env';
 
 const firebaseConfig = {
@@ -41,7 +41,9 @@ export default function BookFromShelf({ route }) {
   };
 
   useEffect(() => {
-    onValue(ref(database, `books/${shelf}/${index}/notes/`), (snapshot) => {
+    const allNotesRef = query(ref(database, 'notes/'), orderByChild("bookkey"), equalTo(index));
+    console.log(allNotesRef);
+    onValue(allNotesRef, (snapshot) => {
       const data = snapshot.val();
       setNotes(Object.values(data));
       setKeys(Object.keys(data));
@@ -70,15 +72,15 @@ export default function BookFromShelf({ route }) {
 
   const saveNote = () => {
     const time = new Date();
-    push(ref(database, `books/${shelf}/${index}/notes`), 
-      {title: title, note: note, time: `${time.getDate()}.${time.getMonth() + 1}.${time.getFullYear()} ${('0' + time.getHours()).slice(-2)}:${('0' + time.getMinutes()).slice(-2)}`}
+    push(ref(database, `notes/`), 
+      {title: title, bookname: book.title, note: note, time: `${time.getDate()}.${time.getMonth() + 1}.${time.getFullYear()} ${('0' + time.getHours()).slice(-2)}:${('0' + time.getMinutes()).slice(-2)}`, bookkey: index}
     )
     setTitle('');
     setNote('');
   }
 
   const deleteNote = (id) => {
-    remove(ref(database, `books/${shelf}/${index}/notes/` + keys[id]));
+    remove(ref(database, `notes/` + keys[id]));
   }
   
   const itemSeparator = () => {
@@ -207,6 +209,7 @@ export default function BookFromShelf({ route }) {
         <Dialog.Button
             title="SAVE"
             onPress={() => {
+              console.log(`Book key: ${index}, Note title: ${title}`);
               saveNote();
               toggleDialog2();
             }}
