@@ -1,4 +1,5 @@
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import { Button, Text } from '@rneui/themed';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -16,21 +17,29 @@ const Stack = createNativeStackNavigator();
 
 function ShelfScreen({ navigation }) {
   return (
-    <View style={styles.container}>
-      <Text>Your shelves</Text>
-      <Button
-        title="Reading"
-        onPress={() => navigation.navigate('Reading')}
-      />
-      <Button
-        title="Finished"
-        onPress={() => navigation.navigate('Finished')}
-      />
-      <Button
-        title="Want to read"
-        onPress={() => navigation.navigate('Wanttoread')}
-      />
-    </View>
+    <>
+      <Text style={{...styles.title, alignSelf: 'center', marginTop: 160}}>Your bookshelves</Text>
+      <View style={{ justifyContent: 'space-evenly', flexDirection: 'row', margin: 12 }}>
+        <Button
+          radius={'md'}
+          raised
+          title="Reading"
+          onPress={() => navigation.navigate('Reading')}
+        />
+        <Button
+          radius={'md'}
+          raised
+          title="Finished"
+          onPress={() => navigation.navigate('Finished')}
+        />
+        <Button
+          radius={'md'}
+          raised
+          title="Want to read"
+          onPress={() => navigation.navigate('Wanttoread')}
+        />
+      </View>
+    </>
   );
 }
 
@@ -81,10 +90,7 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+  title: {
+    fontSize: 18,
   },
 });

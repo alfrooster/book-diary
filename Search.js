@@ -30,7 +30,6 @@ export default function Search({ navigation }) {
   const [results, setResults] = useState(0);
   const [visible, setVisible] = useState(false);
   const [checked, setChecked] = useState(1);
-  const [option, setOption] = useState('');
   const [index, setIndex] = useState('');
 
   const toggleDialog = () => {
@@ -64,17 +63,34 @@ export default function Search({ navigation }) {
     obj = {'title': data[key].volumeInfo.title,
     'authors': "Unknown",
     'date': data[key].volumeInfo.publishedDate,
-    'isbn': data[key].volumeInfo.industryIdentifiers[0].identifier,
-    'image': "No image"};
+    'isbn': '',
+    'image': "No image",
+    'description': "No description"};
     if (data[key].volumeInfo.authors != undefined) {
       obj.authors = data[key].volumeInfo.authors
     }
     if (data[key].volumeInfo.imageLinks != undefined) {
       obj.image = data[key].volumeInfo.imageLinks.thumbnail
     }
-    push(
-      ref(database, `books/${option}`), obj
-    )
+    if (data[key].volumeInfo.industryIdentifiers != undefined) {
+      obj.isbn = data[key].volumeInfo.industryIdentifiers[0].identifier
+    }
+    if (data[key].volumeInfo.description != undefined) {
+      obj.description = data[key].volumeInfo.description
+    }
+    if (option == 1) {
+      push(
+        ref(database, `books/Reading`), obj
+      )
+    } else if (option == 2){
+      push(
+        ref(database, `books/Finished`), obj
+      )
+    } else if (option == 3){
+      push(
+        ref(database, `books/Want to read`), obj
+      )
+    } 
   }
 
   const itemSeparator = () => {
@@ -170,17 +186,16 @@ export default function Search({ navigation }) {
             checked={checked === i + 1}
             onPress={() => {
               setChecked(i + 1);
-              setOption(l);
             }}
           />
         ))}
 
         <Dialog.Actions>
           <Dialog.Button
-            title="CONFIRM"
+            title="SAVE"
             onPress={() => {
-              console.log(`${data[index].volumeInfo.title} was saved in ${option}`);
-              saveItem(index, option);
+              console.log(`${data[index].volumeInfo.title} was saved in option ${checked}`);
+              saveItem(index, checked);
               toggleDialog();
             }}
           />

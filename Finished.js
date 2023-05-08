@@ -22,7 +22,7 @@ if (getApps().length === 0) {
 const app = getApp();
 const database = getDatabase(app);
 
-export default function Finished() {
+export default function Finished({ navigation }) {
   const [books, setBooks] = useState([]);
   const [keys, setKeys] = useState([]);
   const [visible, setVisible] = useState(false);
@@ -67,7 +67,6 @@ export default function Finished() {
 
   return (
     <View>
-      <Text style={{ marginTop: 10, marginLeft: 10 }}>X books in your collection</Text>
       <FlatList
         data={books}
         style={{ marginLeft: 10, marginRight: 10 }}
@@ -111,8 +110,7 @@ export default function Finished() {
               raised
               title='MOVE'
             />
-            <Button radius={'md'} type='outline' raised title='SHOW BOOK' />
-            {/* pressing on book will take you to book's page, stack navigation to Book.js */}
+            <Button onPress={() => navigation.navigate('BookFromShelf', {book: books[index], shelf: 'Finished', index: keys[index]})} radius={'md'} type='outline' raised title='SHOW BOOK' />
           </View>
           </>}
       />
@@ -137,7 +135,7 @@ export default function Finished() {
 
         <Dialog.Actions>
           <Dialog.Button
-            title="CONFIRM"
+            title="MOVE"
             onPress={() => {
               console.log(`${books[index].title} was moved to option ${checked}`);
               saveItem(index, checked);
