@@ -22,7 +22,7 @@ if (getApps().length === 0) {
 const app = getApp();
 const database = getDatabase(app);
 
-export default function Search() {
+export default function Search({ navigation }) {
   const [data, setData] = useState([]);
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
@@ -142,7 +142,6 @@ export default function Search() {
             </View>
           </View>
           <View style={{ justifyContent: 'space-evenly', flexDirection: 'row', marginTop: 10 }}>
-            <Button radius={'md'} type='outline' raised title='1' />
             <Button onPress={() => {
               setIndex(index);
               toggleDialog();
@@ -150,10 +149,9 @@ export default function Search() {
               radius={'md'}
               type='outline'
               raised
-              title='ADD to shelf'
+              title='ADD TO SHELF'
             />
-            <Button radius={'md'} type='outline' raised title='SHOW BOOK' />
-            {/* pressing on book will take you to book's page, stack navigation to Book.js */}
+            <Button onPress={() => navigation.navigate('Book', {book: data[index]})} radius={'md'} type='outline' raised title='SHOW BOOK' />
           </View>
           </>}
       />
@@ -181,7 +179,7 @@ export default function Search() {
           <Dialog.Button
             title="CONFIRM"
             onPress={() => {
-              console.log(`Index: ${index}. Option ${option} was selected! Book: ${data[index].volumeInfo.title}`);
+              console.log(`${data[index].volumeInfo.title} was saved in ${option}`);
               saveItem(index, option);
               toggleDialog();
             }}

@@ -8,6 +8,8 @@ import Diary from './Diary.js';
 import Reading from './Reading.js';
 import Finished from './Finished.js';
 import Wanttoread from './Wanttoread.js';
+import Book from './Book.js';
+import BookFromShelf from './BookFromShelf.js';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -32,13 +34,23 @@ function ShelfScreen({ navigation }) {
   );
 }
 
+function SearchNav() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name="SearchScreen" component={Search} options={{ title: 'Search' }} />
+      <Stack.Screen name="Book" component={Book} />
+    </Stack.Navigator>
+  );
+}
+
 function ShelfNav() {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="ShelfScreen" component={ShelfScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="ShelfScreen" component={ShelfScreen} options={{ title: 'Shelf' }} />
       <Stack.Screen name="Reading" component={Reading} />
       <Stack.Screen name="Finished" component={Finished} />
       <Stack.Screen name="Wanttoread" component={Wanttoread} options={{ title: 'Want to read' }} />
+      <Stack.Screen name="BookFromShelf" component={BookFromShelf} options={{ title: 'Book' }} />
     </Stack.Navigator>
   );
 }
@@ -60,8 +72,8 @@ export default function App() {
             return <Ionicons name={iconName} size={size} color={color} />;
           },
         })}>
-        <Tab.Screen name="Search" component={Search} />
-        <Tab.Screen name="Shelf" component={ShelfNav} />
+        <Tab.Screen name="Search" component={SearchNav} options={{ headerShown: false }} />
+        <Tab.Screen name="Shelf" component={ShelfNav} options={{ headerShown: false }} />
         <Tab.Screen name="Diary" component={Diary} />
       </Tab.Navigator>
     </NavigationContainer>
