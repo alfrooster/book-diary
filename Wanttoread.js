@@ -22,11 +22,11 @@ if (getApps().length === 0) {
 const app = getApp();
 const database = getDatabase(app);
 
-export default function Shelf() {
+export default function Wanttoread() {
   const [books, setBooks] = useState([]);
   const [keys, setKeys] = useState([]);
 
-  const itemsRef = ref(database, 'books/');
+  const itemsRef = ref(database, 'books/Want to read/');
 
   useEffect(() => {
     onValue(itemsRef, (snapshot) => {
@@ -37,7 +37,7 @@ export default function Shelf() {
   }, []);
   
   const deleteItem = (id) => {
-    remove(ref(database, 'books/' + keys[id]));
+    remove(ref(database, 'books/Want to read/' + keys[id]));
   }
 
   const itemSeparator = () => {

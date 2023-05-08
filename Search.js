@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { FlatList, View, Image, StyleSheet } from 'react-native';
-import { Input, Button, Text } from '@rneui/themed';
+import { Input, Button, Text, Dialog, CheckBox } from '@rneui/themed';
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getDatabase, ref, push } from 'firebase/database';
-import { FB_API_KEY, AUTH_DOMAIN, DATABASE_URL, PROJECT_ID, STORAGE_BUCKET, MESSAGING_SENDER_ID, APP_ID } from '@env';
+import { API_KEY, FB_API_KEY, AUTH_DOMAIN, DATABASE_URL, PROJECT_ID, STORAGE_BUCKET, MESSAGING_SENDER_ID, APP_ID } from '@env';
 
 const firebaseConfig = {
   apiKey: FB_API_KEY,
@@ -28,8 +28,14 @@ export default function Search() {
   const [author, setAuthor] = useState('');
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState(0);
+  const [visible, setVisible] = useState(false);
+  const [checked, setChecked] = useState(1);
+  const [option, setOption] = useState('');
+  const [index, setIndex] = useState('');
 
-  const itemsRef = ref(database, 'books/');
+  const toggleDialog = () => {
+    setVisible(!visible);
+  };
 
   const fetchBook = () => {
     setLoading(true);
@@ -54,7 +60,7 @@ export default function Search() {
     }
   }
 
-  const saveItem = (key) => {
+  const saveItem = (key, option) => {
     obj = {'title': data[key].volumeInfo.title,
     'authors': "Unknown",
     'date': data[key].volumeInfo.publishedDate,
@@ -67,7 +73,7 @@ export default function Search() {
       obj.image = data[key].volumeInfo.imageLinks.thumbnail
     }
     push(
-      itemsRef, obj
+      ref(database, `books/${option}`), obj
     )
   }
 
@@ -137,12 +143,52 @@ export default function Search() {
           </View>
           <View style={{ justifyContent: 'space-evenly', flexDirection: 'row', marginTop: 10 }}>
             <Button radius={'md'} type='outline' raised title='1' />
-            <Button onPress={() => saveItem(index)} radius={'md'} type='outline' raised title='ADD to shelf' />
+            <Button onPress={() => {
+              setIndex(index);
+              toggleDialog();
+              }}
+              radius={'md'}
+              type='outline'
+              raised
+              title='ADD to shelf'
+            />
             <Button radius={'md'} type='outline' raised title='SHOW BOOK' />
             {/* pressing on book will take you to book's page, stack navigation to Book.js */}
           </View>
           </>}
       />
+      <Dialog
+        isVisible={visible}
+        onBackdropPress={toggleDialog}
+      >
+        <Dialog.Title title="Add to shelf:"/>
+        {['Reading', 'Finished', 'Want to read'].map((l, i) => (
+          <CheckBox
+            key={i}
+            title={l}
+            containerStyle={{ backgroundColor: 'white', borderWidth: 0 }}
+            checkedIcon="dot-circle-o"
+            uncheckedIcon="circle-o"
+            checked={checked === i + 1}
+            onPress={() => {
+              setChecked(i + 1);
+              setOption(l);
+            }}
+          />
+        ))}
+
+        <Dialog.Actions>
+          <Dialog.Button
+            title="CONFIRM"
+            onPress={() => {
+              console.log(`Index: ${index}. Option ${option} was selected! Book: ${data[index].volumeInfo.title}`);
+              saveItem(index, option);
+              toggleDialog();
+            }}
+          />
+          <Dialog.Button title="CANCEL" onPress={toggleDialog} />
+        </Dialog.Actions>
+      </Dialog>
     </View>
     
   );
