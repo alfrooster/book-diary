@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { StyleSheet, View, FlatList, Image } from 'react-native';
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getDatabase, ref, onValue, remove } from 'firebase/database';
-import { Button, Text } from '@rneui/themed';
+import { getDatabase, ref, onValue, remove, push } from 'firebase/database';
+import { Button, Text, Dialog, CheckBox } from '@rneui/themed';
 import { FB_API_KEY, AUTH_DOMAIN, DATABASE_URL, PROJECT_ID, STORAGE_BUCKET, MESSAGING_SENDER_ID, APP_ID } from '@env';
 
 const firebaseConfig = {
@@ -25,8 +25,15 @@ const database = getDatabase(app);
 export default function Reading() {
   const [books, setBooks] = useState([]);
   const [keys, setKeys] = useState([]);
+  const [visible, setVisible] = useState(false);
+  const [checked, setChecked] = useState(1);
+  const [index, setIndex] = useState('');
 
   const itemsRef = ref(database, 'books/Reading/');
+
+  const toggleDialog = () => {
+    setVisible(!visible);
+  };
 
   useEffect(() => {
     onValue(itemsRef, (snapshot) => {
@@ -35,6 +42,18 @@ export default function Reading() {
       setKeys(Object.keys(data));
     })
   }, []);
+
+  const saveItem = (key, option) => {
+    if (option == 1) {
+        push(
+            ref(database, `books/Finished`), books[key]
+          )
+    } else if (option == 2){
+        push(
+            ref(database, `books/Want to read`), books[key]
+          )
+    }
+  }
   
   const deleteItem = (id) => {
     remove(ref(database, 'books/Reading/' + keys[id]));
@@ -83,12 +102,52 @@ export default function Reading() {
           </View>
           <View style={{ justifyContent: 'space-evenly', flexDirection: 'row', marginTop: 10 }}>
             <Button onPress={() => deleteItem(index)} radius={'md'} type='outline' raised title='DELETE' />
-            <Button radius={'md'} type='outline' raised title='2' />
+            <Button onPress={() => {
+              setIndex(index);
+              toggleDialog();
+              }}
+              radius={'md'}
+              type='outline'
+              raised
+              title='MOVE'
+            />
             <Button radius={'md'} type='outline' raised title='SHOW BOOK' />
             {/* pressing on book will take you to book's page, stack navigation to Book.js */}
           </View>
           </>}
       />
+      <Dialog
+        isVisible={visible}
+        onBackdropPress={toggleDialog}
+      >
+        <Dialog.Title title="Move to shelf:"/>
+        {['Finished', 'Want to read'].map((l, i) => (
+          <CheckBox
+            key={i}
+            title={l}
+            containerStyle={{ backgroundColor: 'white', borderWidth: 0 }}
+            checkedIcon="dot-circle-o"
+            uncheckedIcon="circle-o"
+            checked={checked === i + 1}
+            onPress={() => {
+              setChecked(i + 1);
+            }}
+          />
+        ))}
+
+        <Dialog.Actions>
+          <Dialog.Button
+            title="CONFIRM"
+            onPress={() => {
+              console.log(`${books[index].title} was moved to option ${checked}`);
+              saveItem(index, checked);
+              deleteItem(index)
+              toggleDialog();
+            }}
+          />
+          <Dialog.Button title="CANCEL" onPress={toggleDialog} />
+        </Dialog.Actions>
+      </Dialog>
     </View>
   );
 }
