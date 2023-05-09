@@ -78,7 +78,7 @@ export default function Diary() {
       <FlatList
         data={notes}
         style={{ marginLeft: 10, marginRight: 10 }}
-        contentContainerStyle={{ paddingTop: 10, paddingBottom: 40 }}
+        contentContainerStyle={{ paddingTop: 10, paddingBottom: 220 }}
         ItemSeparatorComponent={itemSeparator}
         renderItem={({ item, index }) =>
           <> 

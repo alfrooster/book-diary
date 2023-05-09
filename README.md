@@ -8,3 +8,5 @@ rneui - https://reactnativeelements.com/
 firebase realtime database - https://firebase.google.com/
 
 react-native-dotenv - https://www.npmjs.com/package/react-native-dotenv
+
+Google Books API - https://developers.google.com/books
