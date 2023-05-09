@@ -42,7 +42,6 @@ export default function BookFromShelf({ route }) {
 
   useEffect(() => {
     const allNotesRef = query(ref(database, 'notes/'), orderByChild("bookkey"), equalTo(index));
-    console.log(allNotesRef);
     onValue(allNotesRef, (snapshot) => {
       const data = snapshot.val();
       setNotes(Object.values(data));
@@ -122,13 +121,9 @@ export default function BookFromShelf({ route }) {
           null
         )}
         <Text style={styles.boldbody}>Publication date:</Text>
-        <Text style={styles.body}>{book.publishedDate}</Text>
+        <Text style={styles.body}>{book.date}</Text>
         <Text style={styles.boldbody}>ISBN:</Text>
-        {(book.industryIdentifiers != undefined) ? (              
-          <Text style={styles.body}>{book.industryIdentifiers[0].identifier}</Text>
-        ) : (
-          null
-        )}
+        <Text style={styles.body}>{book.isbn}</Text>
         <Text style={styles.boldbody}>Description:</Text>
         <Text style={styles.body}>{book.description}</Text>
       </ScrollView>
